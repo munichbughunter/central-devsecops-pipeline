@@ -1,0 +1,32 @@
+name: Central Dagger Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      src:
+        required: true
+        type: string
+      pythonVersion:
+        required: false
+        type: string
+        default: '3.12'
+
+jobs:
+  build-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout team source
+        uses: actions/checkout@v4
+        with:
+          path: ${{ inputs.src }}
+
+      - name: Set up Dagger CLI
+        run: |
+          curl -L https://dl.dagger.io/dagger/install.sh | sh
+          echo "$HOME/.dagger/bin" >> $GITHUB_PATH
+
+      - name: Run central Dagger pipeline
+        run: |
+          dagger call build-python \
+            --src=${{ inputs.src }} \
+            --pythonVersion=${{ inputs.pythonVersion }}
