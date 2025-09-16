@@ -1,0 +1,31 @@
+name: Publish Base Python Image
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Dagger CLI
+        run: |
+          curl -L https://dl.dagger.io/dagger/install.sh | sh
+          echo "$HOME/.dagger/bin" >> $GITHUB_PATH
+
+      - name: Read version
+        id: version
+        run: echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
+      - name: Build and Publish Default Python Image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dagger call build-default-python-image-and-publish \
+            --imageTag=$VERSION \
+            --githubUsername=munichbughunter \
+            --githubToken=$GITHUB_TOKEN
