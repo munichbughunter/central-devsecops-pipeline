@@ -14,6 +14,15 @@ It enables consistent, secure, and scalable CI/CD workflows for projects in Pyth
 
 ---
 
+```sh
+dagger call build-default-python-image-and-publish \
+  --image-tag latest \
+  --github-username munichbughunter \
+  --github-token env://GITHUB_TOKEN
+```
+
+---
+
 ## Usage for Dev Teams
 
 ### 1. Prerequisites
