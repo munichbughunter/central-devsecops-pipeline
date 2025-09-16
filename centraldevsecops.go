@@ -36,13 +36,19 @@ func (m *CentralDevsecopsPipeline) BuildPython(
 	return ci.RunPythonBuild(ctx, client, src, pythonVersion)
 }
 
-// func (m *CentralDevSecOpsPipeline) Build(ctx context.Context, src *dagger.Directory) (string, error) {
-// 	return ci.RunBuild(ctx, src)
-// }
+// Build and publish the default Python image via the central pipeline
+func (m *CentralDevsecopsPipeline) BuildDefaultPythonImageAndPublish(
+	ctx context.Context,
+	imageTag string,
+	githubUsername string,
+	githubToken *dagger.Secret,
+) (string, error) {
+	// Verbindung zu Dagger aufbauen
+	client := dagger.Connect()
 
-// func (m *CentralDevSecOpsPipeline) Test(ctx context.Context, src *dagger.Directory) (string, error) {
-// 	return pipeline.RunTests(ctx, src)
-// }
+	// Aufruf der CI-Funktion
+	return ci.BuildDefaultPythonImageAndPublish(ctx, client, imageTag, githubUsername, githubToken)
+}
 
 func (m *CentralDevsecopsPipeline) RunSAST(ctx context.Context, src *dagger.Directory) (string, error) {
 	// Dagger Client erzeugen
