@@ -17,4 +17,4 @@ jobs:
         with:
           version: "latest"
           module: github.com/munichbughunter/central-devsecops-pipeline
-          args: build-default-python-image-and-publish --imageTag=${{ github.ref_name }} --githubUsername=munichbughunter --githubToken=env://${{ secrets.TOKEN }}
+          args: build-default-python-image-and-publish --image-tag ${{ github.ref_name }} --github-username munichbughunter --github-token env://${{ secrets.TOKEN }}
