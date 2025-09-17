@@ -14,7 +14,9 @@ jobs:
 
       - name: Build and Publish Default Python Image
         uses:  dagger/dagger-for-github@8.0.0
+        env:
+          GH_TOKEN: ${{ secrets.TOKEN }}
         with:
           version: "latest"
           module: github.com/munichbughunter/central-devsecops-pipeline
-          args: build-default-python-image-and-publish --image-tag ${{ github.ref_name }} --github-username munichbughunter --github-token env://${{ secrets.TOKEN }}
+          args: build-default-python-image-and-publish --image-tag ${{ github.ref_name }} --github-username munichbughunter --github-token env://GH_TOKEN
