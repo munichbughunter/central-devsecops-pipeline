@@ -46,7 +46,7 @@ func (m *CentralDevsecopsPipeline) BuildDefaultPythonImageAndPublish(
 	// Verbindung zu Dagger aufbauen
 	client := dagger.Connect()
 
-	// Aufruf der CI-Funktion
+	// Aufruf der CI-Funktion test
 	return ci.BuildDefaultPythonImageAndPublish(ctx, client, imageTag, githubUsername, githubToken)
 }
 
