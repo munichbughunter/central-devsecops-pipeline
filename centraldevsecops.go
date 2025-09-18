@@ -50,9 +50,11 @@ func (m *CentralDevsecopsPipeline) BuildDefaultPythonImageAndPublish(
 	return ci.BuildDefaultPythonImageAndPublish(ctx, client, imageTag, githubUsername, githubToken)
 }
 
-func (m *CentralDevsecopsPipeline) RunSAST(ctx context.Context, src *dagger.Directory) (string, error) {
-	// Dagger Client erzeugen
+// ScanContainerImage scannt ein Container Image auf Vulnerabilities
+func (m *CentralDevsecopsPipeline) ScanImage(
+	ctx context.Context,
+	imageRef string,
+) (string, error) {
 	client := dagger.Connect()
-
-	return ci.RunSAST(ctx, client, src)
+	return ci.RunImageScan(ctx, client, imageRef)
 }

@@ -6,22 +6,23 @@ import (
 	"github.com/munichbughunter/central-devsecops-pipeline/internal/dagger"
 )
 
-func RunSAST(ctx context.Context, dag *dagger.Client, src *dagger.Directory) (string, error) {
-	container := dag.Container().
-		// Go 1.23 ist die neueste verfügbare stabile Version
-		From("golang:1.23").
-		WithMountedDirectory("/src", src).
-		WithWorkdir("/src").
-		// Git und curl installieren
-		WithExec([]string{"apt-get", "update"}).
-		WithExec([]string{"apt-get", "install", "-y", "git", "curl"}).
-		// GOTOOLCHAIN auf auto setzen, damit Go 1.25 automatisch heruntergeladen wird
-		WithEnvVariable("GOTOOLCHAIN", "auto").
-		// Projekt-Dependencies auflösen
-		WithExec([]string{"go", "mod", "download"}).
-		// golangci-lint installieren (neueste Version)
-		WithExec([]string{"bash", "-c", "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin"})
+// RunImageScan führt einen Trivy Vulnerability Scan auf einem Container Image durch
+func RunImageScan(ctx context.Context, dag *dagger.Client, imageRef string) (string, error) {
+	return dag.
+		Trivy().
+		ScanImage(ctx, imageRef)
 
-	// Nur spezifische Verzeichnisse scannen (Paket-basiert)
-	return container.WithExec([]string{"/usr/local/bin/golangci-lint", "run", "./ci/...", "."}).Stdout(ctx)
+	// // Trivy Module aus dem Daggerverse laden
+	// trivy := dag.Module("github.com/jpadams/daggerverse/trivy@44c178290a412483e785a436aabc46c707842a62")
+
+	// // Container Image scannen
+	// result := trivy.Call("ScanImage", dagger.ModuleCallOpts{
+	// 	Args: []dagger.CallArgument{
+	// 		{Name: "imageRef", Value: imageRef},
+	// 		{Name: "format", Value: "table"}, // Optionen: table, json, sarif
+	// 		{Name: "severity", Value: "HIGH,CRITICAL"}, // Nur High und Critical Vulnerabilities
+	// 	},
+	// })
+
+	// return result.Stdout(ctx)
 }
