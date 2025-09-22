@@ -18,7 +18,7 @@ jobs:
         with:
             version: "latest"
             module: github.com/munichbughunter/central-devsecops-pipeline
-            args: scan-image --image-ref ${{ github.ref_name }} --github-username munichbughunter --github-token env://GH_TOKEN
+            args: scan-image --image-ref ${{ github.ref_name }} --github-username munichbughunter --github-token env://GH_TOKEN --output trivy-report.sarif
 
       - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
