@@ -11,6 +11,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set IMAGE_REF
+        run: |
+            if [ "${{ github.ref_type }}" = "tag" ]; then
+                echo "IMAGE_REF=ghcr.io/munichbughunter/default-python:${{ github.ref_name }}" >> $GITHUB_ENV
+            else
+                echo "IMAGE_REF=ghcr.io/munichbughunter/default-python:latest" >> $GITHUB_ENV
+            fi
+
       - name: Run Trivy via Dagger
         uses:  dagger/dagger-for-github@8.0.0
         env:
@@ -18,7 +26,7 @@ jobs:
         with:
             version: "latest"
             module: github.com/munichbughunter/central-devsecops-pipeline
-            args: scan-image --image-ref ${{ github.ref_name }} --github-username munichbughunter --github-token env://GH_TOKEN --output trivy-report.sarif
+            args: scan-image --image-ref ${{ env.IMAGE_REF }} --github-username munichbughunter --github-token env://GH_TOKEN --output trivy-report.sarif
 
       - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
