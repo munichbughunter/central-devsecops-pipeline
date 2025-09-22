@@ -1,0 +1,26 @@
+name: Trivy Scan
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy via Dagger
+        uses:  dagger/dagger-for-github@8.0.0
+        env:
+            GH_TOKEN: ${{ secrets.TOKEN }}
+        with:
+            version: "latest"
+            module: github.com/munichbughunter/central-devsecops-pipeline
+            args: scan-image --image-ref ${{ github.ref_name }} --github-username munichbughunter --github-token env://GH_TOKEN --output trivy-report.sarif
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-report.sarif

@@ -26,12 +26,6 @@ require (
 )
 
 require (
-	github.com/adrg/xdg v0.5.3 // indirect
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
-)
-
-require (
-	dagger.io/dagger v0.18.17
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
@@ -56,4 +50,3 @@ replace go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp => go.opente
 replace go.opentelemetry.io/otel/log => go.opentelemetry.io/otel/log v0.12.2
 
 replace go.opentelemetry.io/otel/sdk/log => go.opentelemetry.io/otel/sdk/log v0.12.2
-

@@ -25,6 +25,19 @@ func BuildDefaultPythonImageAndPublish(ctx context.Context, client *dagger.Clien
 		WithUser("appuser").
 		WithWorkdir("/app")
 
+	// Trivy Scan direct on the container before publishing		
+	out, err := client.Trivy().ScanContainer(ctx, image, dagger.TrivyScanContainerOpts{
+		Severity:      "HIGH,CRITICAL,MEDIUM",
+		ExitCode:      1,
+		Format:        "table",
+		TrivyImageTag: "latest",
+	})
+	if err != nil {
+		return "", err
+	}
+	
+	fmt.Printf("trivy scan result:\n%s\n", out)
+	
 	// Reuse the generic publish function
 	return publishImage(ctx, client, image, imageTag, githubUsername, githubToken, "default-python")
 }

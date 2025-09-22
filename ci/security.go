@@ -6,22 +6,20 @@ import (
 	"github.com/munichbughunter/central-devsecops-pipeline/internal/dagger"
 )
 
-func RunSAST(ctx context.Context, dag *dagger.Client, src *dagger.Directory) (string, error) {
-	container := dag.Container().
-		// Go 1.23 ist die neueste verfügbare stabile Version
-		From("golang:1.23").
-		WithMountedDirectory("/src", src).
-		WithWorkdir("/src").
-		// Git und curl installieren
-		WithExec([]string{"apt-get", "update"}).
-		WithExec([]string{"apt-get", "install", "-y", "git", "curl"}).
-		// GOTOOLCHAIN auf auto setzen, damit Go 1.25 automatisch heruntergeladen wird
-		WithEnvVariable("GOTOOLCHAIN", "auto").
-		// Projekt-Dependencies auflösen
-		WithExec([]string{"go", "mod", "download"}).
-		// golangci-lint installieren (neueste Version)
-		WithExec([]string{"bash", "-c", "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin"})
+// RunImageScan erzeugt eine SARIF-Datei für ein bestehendes Image (mit GHCR-Auth)
+func RunImageScan(ctx context.Context, dag *dagger.Client, imageRef string, githubUsername string, githubToken *dagger.Secret) (*dagger.File, error) {
+	ctr := dag.
+		Container().
+		WithRegistryAuth("ghcr.io", githubUsername, githubToken).
+		From(imageRef)
 
-	// Nur spezifische Verzeichnisse scannen (Paket-basiert)
-	return container.WithExec([]string{"/usr/local/bin/golangci-lint", "run", "./ci/...", "."}).Stdout(ctx)
+	out, err := dag.Trivy().ScanContainer(ctx, ctr, dagger.TrivyScanContainerOpts{
+		Severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL",
+		ExitCode: 0,      // nicht failen; wir wollen SARIF erzeugen
+		Format:   "sarif",
+	})
+	if err != nil {
+		return nil, err
+	}
+	return dag.File("trivy-report.sarif", out), nil
 }
