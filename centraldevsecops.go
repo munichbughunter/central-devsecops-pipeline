@@ -54,7 +54,10 @@ func (m *CentralDevsecopsPipeline) BuildDefaultPythonImageAndPublish(
 func (m *CentralDevsecopsPipeline) ScanImage(
 	ctx context.Context,
 	imageRef string,
-) (string, error) {
+	githubUsername string,
+	githubToken *dagger.Secret,
+) (*dagger.File, error) {
 	client := dagger.Connect()
-	return ci.RunImageScan(ctx, client, imageRef)
+	return ci.RunImageScan(ctx, client, imageRef, githubUsername, githubToken)
 }
+
