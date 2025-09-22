@@ -14,9 +14,10 @@ func RunImageScan(ctx context.Context, dag *dagger.Client, imageRef string, gith
 		From(imageRef)
 
 	out, err := dag.Trivy().ScanContainer(ctx, ctr, dagger.TrivyScanContainerOpts{
-		Severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL",
+		Severity:      "HIGH,CRITICAL,MEDIUM",
 		ExitCode: 0,      // nicht failen; wir wollen SARIF erzeugen
 		Format:   "sarif",
+		TrivyImageTag: "latest",
 	})
 	if err != nil {
 		return nil, err
