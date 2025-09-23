@@ -61,3 +61,12 @@ func (m *CentralDevsecopsPipeline) ScanImage(
 	return ci.RunImageScan(ctx, client, imageRef, githubUsername, githubToken)
 }
 
+// RunFullSASTScan führt Semgrep SAST-Scanner aus und gibt den Report zurück
+func (m *CentralDevsecopsPipeline) SastScan(
+	ctx context.Context,
+	// Quellverzeichnis für den Scan
+	src *dagger.Directory,
+) (*dagger.File, error) {
+	client := dagger.Connect()
+	return ci.RunSemgrepScan(ctx, client, src), nil
+}

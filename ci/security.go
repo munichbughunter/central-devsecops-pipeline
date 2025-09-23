@@ -24,3 +24,20 @@ func RunImageScan(ctx context.Context, dag *dagger.Client, imageRef string, gith
 	}
 	return dag.File("trivy-report.sarif", out), nil
 }
+
+// RunSemgrepScan erzeugt eine SARIF-Datei für ein bestehendes Image (mit GHCR-Auth)
+func RunSemgrepScan(ctx context.Context, dag *dagger.Client, src *dagger.Directory) (*dagger.File) {
+	return dag.
+		Container().
+		From("returntocorp/semgrep:latest").
+		WithMountedDirectory("/src", src).
+		WithWorkdir("/src").
+		WithExec([]string{
+			"semgrep",
+			"--config=auto",
+			"--sarif",
+			"--output=semgrep-report.sarif",
+			".",
+		}).
+		File("semgrep-report.sarif")
+}
